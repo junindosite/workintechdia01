@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jogo da Velha</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="text-center">
+    <h1 class="text-3xl font-bold mb-4">Jogo da Velha</h1>
+
+    <!-- Score -->
+    <div class="mb-6">
+      <p class="text-blue-600 font-bold">X (Azul): <span id="scoreX">0</span></p>
+      <p class="text-red-600 font-bold">O (Vermelho): <span id="scoreO">0</span></p>
+    </div>
+
+    <!-- Tabuleiro -->
+    <div id="board" class="grid grid-cols-3 gap-2 w-60 mx-auto">
+      <!-- As 9 casas serão geradas via JavaScript -->
+    </div>
+
+    <button onclick="resetGame(true)" class="mt-6 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Reiniciar Tudo</button>
+  </div>
+
+  <script>
+    const boardElement = document.getElementById('board');
+    const scoreXEl = document.getElementById('scoreX');
+    const scoreOEl = document.getElementById('scoreO');
+    let board = Array(9).fill('');
+    let currentPlayer = 'X';
+    let score = { X: 0, O: 0 };
+
+    function createBoard() {
+      boardElement.innerHTML = '';
+      board.forEach((val, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'w-20 h-20 bg-white border border-gray-400 flex items-center justify-center text-3xl font-bold cursor-pointer';
+        cell.innerText = val;
+        cell.style.color = val === 'X' ? '#2563EB' : val === 'O' ? '#DC2626' : 'black';
+        cell.addEventListener('click', () => makeMove(i));
+        boardElement.appendChild(cell);
+      });
+    }
+
+    function makeMove(index) {
+      if (board[index] !== '') return;
+      board[index] = currentPlayer;
+      if (checkWin(currentPlayer)) {
+        alert(`${currentPlayer} venceu!`);
+        score[currentPlayer]++;
+        updateScore();
+        resetGame();
+        return;
+      }
+      if (board.every(cell => cell !== '')) {
+        alert('Empate!');
+        resetGame();
+        return;
+      }
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      createBoard();
+    }
+
+    function checkWin(player) {
+      const wins = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return wins.some(line => line.every(i => board[i] === player));
+    }
+
+    function resetGame(full = false) {
+      board = Array(9).fill('');
+      currentPlayer = 'X';
+      if (full) {
+        score = { X: 0, O: 0 };
+        updateScore();
+      }
+      createBoard();
+    }
+
+    function updateScore() {
+      scoreXEl.textContent = score.X;
+      scoreOEl.textContent = score.O;
+    }
+
+    createBoard();
+  </script>
+</body>
+</html>
